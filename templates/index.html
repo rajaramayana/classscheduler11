@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="jumbotron bg-primary text-white p-5 rounded mb-4">
+            <h1 class="display-4">
+                <i class="fas fa-calendar-alt me-3"></i>Class Routine Management System
+            </h1>
+            <p class="lead">Comprehensive scheduling solution for educational institutions</p>
+            <hr class="my-4" style="border-color: rgba(255,255,255,0.3);">
+            <p>Manage courses, teachers, and class assignments with automated conflict-free timetable generation.</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card h-100 border-primary">
+            <div class="card-body text-center">
+                <i class="fas fa-book fa-3x text-primary mb-3"></i>
+                <h5 class="card-title">Course Management</h5>
+                <p class="card-text">Add, view, and manage course information including course codes, names, and credit hours.</p>
+                <a href="{{ url_for('courses') }}" class="btn btn-primary">
+                    <i class="fas fa-arrow-right me-1"></i>Manage Courses
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card h-100 border-success">
+            <div class="card-body text-center">
+                <i class="fas fa-chalkboard-teacher fa-3x text-success mb-3"></i>
+                <h5 class="card-title">Teacher Management</h5>
+                <p class="card-text">Maintain teacher profiles with codes, names, and designations for assignment tracking.</p>
+                <a href="{{ url_for('teachers') }}" class="btn btn-success">
+                    <i class="fas fa-arrow-right me-1"></i>Manage Teachers
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card h-100 border-warning">
+            <div class="card-body text-center">
+                <i class="fas fa-tasks fa-3x text-warning mb-3"></i>
+                <h5 class="card-title">Course Assignments</h5>
+                <p class="card-text">Assign courses to teachers with program, semester, day, and period specifications.</p>
+                <a href="{{ url_for('assignments') }}" class="btn btn-warning">
+                    <i class="fas fa-arrow-right me-1"></i>Manage Assignments
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card h-100 border-info">
+            <div class="card-body text-center">
+                <i class="fas fa-calendar-week fa-3x text-info mb-3"></i>
+                <h5 class="card-title">View Routines</h5>
+                <p class="card-text">Generate and view weekly class schedules for different programs and semesters.</p>
+                <a href="{{ url_for('routines') }}" class="btn btn-info">
+                    <i class="fas fa-arrow-right me-1"></i>View Routines
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>System Information
+                </h5>
+            </div>
+            <div class="card-body">
+                <h6><i class="fas fa-graduation-cap me-2"></i>Supported Programs:</h6>
+                <ul>
+                    {% for program in programs %}
+                    <li>{{ program }}</li>
+                    {% endfor %}
+                </ul>
+                
+                <h6><i class="fas fa-calendar-alt me-2"></i>Academic Structure:</h6>
+                <ul>
+                    <li>Semesters: 1-8</li>
+                    <li>Weekly Schedule: Sunday to Friday (Saturday off)</li>
+                    <li>Daily Periods: 6 periods (6:30 AM - 11:40 AM)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-clock me-2"></i>Class Schedule
+                </h5>
+            </div>
+            <div class="card-body">
+                {% for period, time in periods.items() %}
+                <div class="d-flex justify-content-between align-items-center py-1">
+                    <span><strong>Period {{ period }}:</strong></span>
+                    <span class="badge bg-primary">{{ time }}</span>
+                </div>
+                {% endfor %}
+                <hr>
+                <div class="text-center">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Break: 9:00 AM - 9:10 AM (between Period 3 and 4)
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

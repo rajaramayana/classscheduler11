@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}Class Routines - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-calendar-week me-2"></i>Class Routines</h2>
+        <p class="text-muted">Generate and view weekly class schedules for different programs and semesters.</p>
+    </div>
+</div>
+
+<!-- Program and Semester Selection -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Select Program & Semester</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="program_select" class="form-label">Program *</label>
+                            <select class="form-select" id="program_select" required>
+                                <option value="">Select Program</option>
+                                {% for program in programs %}
+                                <option value="{{ program }}">{{ program }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="semester_select" class="form-label">Semester *</label>
+                            <select class="form-select" id="semester_select" required>
+                                <option value="">Select Semester</option>
+                                {% for semester in semesters %}
+                                <option value="{{ semester }}">{{ semester }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-primary" onclick="loadRoutine()">
+                    <i class="fas fa-search me-1"></i>Load Routine
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Indicator -->
+<div id="loading" class="text-center py-4" style="display: none;">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2">Loading routine...</p>
+</div>
+
+<!-- Error Message -->
+<div id="error_message" class="alert alert-warning" style="display: none;" role="alert">
+    <i class="fas fa-exclamation-triangle me-2"></i>
+    <span id="error_text"></span>
+</div>
+
+<!-- Routine Display -->
+<div id="routine_display" style="display: none;">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0 d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-calendar-alt me-2"></i>Weekly Routine</span>
+                        <span id="routine_title" class="badge bg-light text-dark fs-6"></span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="routine_table" class="table-responsive routine-table"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-list-alt me-2"></i>Detailed Schedule</h5>
+                </div>
+                <div class="card-body">
+                    <div id="detailed_schedule"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function loadRoutine() {
+    const program = document.getElementById('program_select').value;
+    const semester = document.getElementById('semester_select').value;
+    
+    if (!program || !semester) {
+        alert('Please select both program and semester.');
+        return;
+    }
+    
+    // Show loading
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('error_message').style.display = 'none';
+    document.getElementById('routine_display').style.display = 'none';
+    
+    // Fetch routine data
+    fetch(`/get_routine/${program}/${semester}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('loading').style.display = 'none';
+            
+            if (data.error) {
+                document.getElementById('error_text').textContent = data.error;
+                document.getElementById('error_message').style.display = 'block';
+            } else {
+                // Display routine
+                document.getElementById('routine_title').textContent = `${program} - Semester ${semester}`;
+                document.getElementById('routine_table').innerHTML = data.html_table;
+                
+                // Display detailed schedule
+                let detailedHtml = '';
+                data.detailed_schedule.forEach(dayData => {
+                    detailedHtml += `
+                        <div class="mb-4">
+                            <h6><strong><i class="fas fa-calendar-day me-2"></i>${dayData.day}:</strong></h6>
+                            <div class="ps-3">
+                    `;
+                    
+                    dayData.classes.forEach(classInfo => {
+                        detailedHtml += `
+                            <div class="mb-2 p-2 border-start border-primary border-3">
+                                <strong>• Period ${classInfo.period} (${classInfo.time}):</strong><br>
+                                <span class="text-primary fw-bold ms-3">${classInfo.course_name}</span><br>
+                                <span class="text-muted fst-italic ms-3">(${classInfo.teacher_name})</span>
+                            </div>
+                        `;
+                    });
+                    
+                    detailedHtml += '</div></div>';
+                });
+                
+                document.getElementById('detailed_schedule').innerHTML = detailedHtml;
+                document.getElementById('routine_display').style.display = 'block';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error_text').textContent = 'Failed to load routine. Please try again.';
+            document.getElementById('error_message').style.display = 'block';
+        });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}Teacher Schedules - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-user-clock me-2"></i>Teacher Schedules</h2>
+        <p class="text-muted">View individual teacher schedules across all programs and semesters.</p>
+    </div>
+</div>
+
+<!-- Teacher Selection -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-user-check me-2"></i>Select Teacher</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="mb-3">
+                            <label for="teacher_select" class="form-label">Teacher *</label>
+                            <select class="form-select" id="teacher_select" required>
+                                <option value="">Select Teacher</option>
+                                {% for teacher in teachers %}
+                                <option value="{{ teacher.Teacher_Code }}">{{ teacher.Teacher_Code }} - {{ teacher.Teacher_Name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">&nbsp;</label>
+                            <button type="button" class="btn btn-success w-100" onclick="loadTeacherRoutine()">
+                                <i class="fas fa-search me-1"></i>Load Schedule
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Indicator -->
+<div id="loading" class="text-center py-4" style="display: none;">
+    <div class="spinner-border text-success" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2">Loading teacher schedule...</p>
+</div>
+
+<!-- Error Message -->
+<div id="error_message" class="alert alert-warning" style="display: none;" role="alert">
+    <i class="fas fa-exclamation-triangle me-2"></i>
+    <span id="error_text"></span>
+</div>
+
+<!-- Teacher Routine Display -->
+<div id="routine_display" style="display: none;">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0 d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-calendar-user me-2"></i>Weekly Schedule</span>
+                        <span id="routine_title" class="badge bg-light text-dark fs-6"></span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="routine_table" class="table-responsive routine-table"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-list-alt me-2"></i>Detailed Schedule</h5>
+                </div>
+                <div class="card-body">
+                    <div id="detailed_schedule"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function loadTeacherRoutine() {
+    const teacherCode = document.getElementById('teacher_select').value;
+    
+    if (!teacherCode) {
+        alert('Please select a teacher.');
+        return;
+    }
+    
+    // Show loading
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('error_message').style.display = 'none';
+    document.getElementById('routine_display').style.display = 'none';
+    
+    // Fetch teacher routine data
+    fetch(`/get_teacher_routine/${teacherCode}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('loading').style.display = 'none';
+            
+            if (data.error) {
+                document.getElementById('error_text').textContent = data.error;
+                document.getElementById('error_message').style.display = 'block';
+            } else {
+                // Display routine
+                document.getElementById('routine_title').textContent = `${data.teacher_name} (${teacherCode})`;
+                document.getElementById('routine_table').innerHTML = data.html_table;
+                
+                // Display detailed schedule
+                let detailedHtml = '';
+                data.detailed_schedule.forEach(dayData => {
+                    detailedHtml += `
+                        <div class="mb-4">
+                            <h6><strong><i class="fas fa-calendar-day me-2"></i>${dayData.day}:</strong></h6>
+                            <div class="ps-3">
+                    `;
+                    
+                    dayData.classes.forEach(classInfo => {
+                        detailedHtml += `
+                            <div class="mb-2 p-2 border-start border-success border-3">
+                                <strong>• Period ${classInfo.period} (${classInfo.time}):</strong><br>
+                                <span class="text-success fw-bold ms-3">${classInfo.course_name}</span><br>
+                                <span class="text-muted fst-italic ms-3">(${classInfo.program} Sem ${classInfo.semester})</span>
+                            </div>
+                        `;
+                    });
+                    
+                    detailedHtml += '</div></div>';
+                });
+                
+                document.getElementById('detailed_schedule').innerHTML = detailedHtml;
+                document.getElementById('routine_display').style.display = 'block';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error_text').textContent = 'Failed to load teacher schedule. Please try again.';
+            document.getElementById('error_message').style.display = 'block';
+        });
+}
+</script>
+{% endblock %}

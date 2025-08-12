@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block title %}Course Assignments - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-tasks me-2"></i>Course Assignments</h2>
+        <p class="text-muted">Assign courses to teachers with program, semester, day, and period specifications.</p>
+    </div>
+</div>
+
+<!-- Add Assignment Form -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="fas fa-plus me-2"></i>Add New Assignment</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('add_assignment') }}">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="teacher_code" class="form-label">Teacher *</label>
+                                <select class="form-select" id="teacher_code" name="teacher_code" required>
+                                    <option value="">Select Teacher</option>
+                                    {% for teacher in teachers %}
+                                    <option value="{{ teacher.Teacher_Code }}">{{ teacher.Teacher_Code }} - {{ teacher.Teacher_Name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="course_code" class="form-label">Course *</label>
+                                <select class="form-select" id="course_code" name="course_code" required>
+                                    <option value="">Select Course</option>
+                                    {% for course in courses %}
+                                    <option value="{{ course.Course_Code }}">{{ course.Course_Code }} - {{ course.Course_Name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="program" class="form-label">Program *</label>
+                                <select class="form-select" id="program" name="program" required>
+                                    <option value="">Select Program</option>
+                                    {% for program in programs %}
+                                    <option value="{{ program }}">{{ program }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="semester" class="form-label">Semester *</label>
+                                <select class="form-select" id="semester" name="semester" required>
+                                    <option value="">Select Semester</option>
+                                    {% for semester in semesters %}
+                                    <option value="{{ semester }}">{{ semester }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="day" class="form-label">Day *</label>
+                                <select class="form-select" id="day" name="day" required>
+                                    <option value="">Select Day</option>
+                                    {% for day in days %}
+                                    <option value="{{ day }}">{{ day }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="period" class="form-label">Period *</label>
+                                <select class="form-select" id="period" name="period" required>
+                                    <option value="">Select Period</option>
+                                    {% for period, time in periods.items() %}
+                                    <option value="{{ period }}">Period {{ period }} ({{ time }})</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label class="form-label">&nbsp;</label>
+                                <button type="submit" class="btn btn-warning w-100">
+                                    <i class="fas fa-save me-1"></i>Add Assignment
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Assignments List -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-list me-2"></i>Current Assignments ({{ assignments|length }})</h5>
+            </div>
+            <div class="card-body">
+                {% if assignments %}
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Program</th>
+                                <th>Semester</th>
+                                <th>Day</th>
+                                <th>Period</th>
+                                <th>Course</th>
+                                <th>Teacher</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for assignment in assignments %}
+                            <tr>
+                                <td><span class="badge bg-primary">{{ assignment.Program }}</span></td>
+                                <td><span class="badge bg-secondary">Sem {{ assignment.Semester }}</span></td>
+                                <td><strong>{{ assignment.Day }}</strong></td>
+                                <td>
+                                    <span class="badge bg-info">
+                                        P{{ assignment.Period }} 
+                                        {% if periods[assignment.Period] %}
+                                        ({{ periods[assignment.Period] }})
+                                        {% endif %}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div>
+                                        <strong class="text-primary">{{ assignment.Course_Name }}</strong><br>
+                                        <small class="text-muted">({{ assignment.Course_Code }})</small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <strong>{{ assignment.Teacher_Name }}</strong><br>
+                                        <small class="text-muted">({{ assignment.Teacher_Code }})</small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <form method="POST" action="{{ url_for('delete_assignment') }}" class="d-inline">
+                                        <input type="hidden" name="teacher_code" value="{{ assignment.Teacher_Code }}">
+                                        <input type="hidden" name="course_code" value="{{ assignment.Course_Code }}">
+                                        <input type="hidden" name="program" value="{{ assignment.Program }}">
+                                        <input type="hidden" name="semester" value="{{ assignment.Semester }}">
+                                        <input type="hidden" name="day" value="{{ assignment.Day }}">
+                                        <input type="hidden" name="period" value="{{ assignment.Period }}">
+                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this assignment?')">
+                                            <i class="fas fa-trash me-1"></i>Delete
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-tasks fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">No assignments found. Create your first assignment using the form above.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
