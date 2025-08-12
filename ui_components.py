@@ -352,7 +352,13 @@ def render_routine_display(db: DatabaseManager):
             st.write(f"**{day}:**")
             for _, class_info in day_schedule.iterrows():
                 period_time = Constants.PERIODS.get(int(class_info['Period']), "Unknown")
-                st.write(f"- Period {class_info['Period']} ({period_time}): {class_info['Course_Name']} - {class_info['Teacher_Name']}")
+                st.markdown(f"""
+                <div style='margin-left: 20px; margin-bottom: 8px;'>
+                    <strong>• Period {class_info['Period']} ({period_time}):</strong><br>
+                    <span style='color: #1f77b4; font-weight: bold; margin-left: 15px;'>{class_info['Course_Name']}</span><br>
+                    <span style='color: #666; font-style: italic; margin-left: 15px;'>({class_info['Teacher_Name']})</span>
+                </div>
+                """, unsafe_allow_html=True)
 
 def render_teacher_routine_display(db: DatabaseManager):
     """Render teacher routine display section"""
@@ -399,4 +405,10 @@ def render_teacher_routine_display(db: DatabaseManager):
                 st.write(f"**{day}:**")
                 for _, class_info in day_schedule.iterrows():
                     period_time = Constants.PERIODS.get(int(class_info['Period']), "Unknown")
-                    st.write(f"- Period {class_info['Period']} ({period_time}): {class_info['Course_Name']} - {class_info['Program']} Sem {class_info['Semester']}")
+                    st.markdown(f"""
+                    <div style='margin-left: 20px; margin-bottom: 8px;'>
+                        <strong>• Period {class_info['Period']} ({period_time}):</strong><br>
+                        <span style='color: #1f77b4; font-weight: bold; margin-left: 15px;'>{class_info['Course_Name']}</span><br>
+                        <span style='color: #666; font-style: italic; margin-left: 15px;'>({class_info['Program']} Sem {class_info['Semester']})</span>
+                    </div>
+                    """, unsafe_allow_html=True)
