@@ -339,8 +339,33 @@ def render_routine_display(db: DatabaseManager):
     # Format data for display
     formatted_routine = format_routine_for_display(routine_data)
     
-    # Display as dataframe
-    st.dataframe(formatted_routine, use_container_width=True)
+    # Display as HTML table to support line breaks
+    def create_html_table(df):
+        html = "<table style='width: 100%; border-collapse: collapse; font-size: 14px;'>"
+        
+        # Header
+        html += "<tr style='background-color: #f0f0f0;'>"
+        for col in df.columns:
+            html += f"<th style='border: 1px solid #ddd; padding: 8px; text-align: center; font-weight: bold;'>{col}</th>"
+        html += "</tr>"
+        
+        # Rows
+        for _, row in df.iterrows():
+            html += "<tr>"
+            for col in df.columns:
+                cell_value = str(row[col]) if row[col] else ""
+                # Replace newlines with HTML line breaks
+                cell_value = cell_value.replace('\n', '<br>')
+                if col == 'Day':
+                    html += f"<td style='border: 1px solid #ddd; padding: 8px; text-align: center; font-weight: bold; background-color: #f8f9fa;'>{cell_value}</td>"
+                else:
+                    html += f"<td style='border: 1px solid #ddd; padding: 8px; text-align: center; vertical-align: top;'>{cell_value}</td>"
+            html += "</tr>"
+        
+        html += "</table>"
+        return html
+    
+    st.markdown(create_html_table(formatted_routine), unsafe_allow_html=True)
     
     # Display detailed schedule
     st.markdown("---")
@@ -392,8 +417,33 @@ def render_teacher_routine_display(db: DatabaseManager):
         # Format for display
         formatted_teacher_routine = format_teacher_routine_for_display(teacher_routine)
         
-        # Display as dataframe
-        st.dataframe(formatted_teacher_routine, use_container_width=True)
+        # Display as HTML table to support line breaks
+        def create_html_table(df):
+            html = "<table style='width: 100%; border-collapse: collapse; font-size: 14px;'>"
+            
+            # Header
+            html += "<tr style='background-color: #f0f0f0;'>"
+            for col in df.columns:
+                html += f"<th style='border: 1px solid #ddd; padding: 8px; text-align: center; font-weight: bold;'>{col}</th>"
+            html += "</tr>"
+            
+            # Rows
+            for _, row in df.iterrows():
+                html += "<tr>"
+                for col in df.columns:
+                    cell_value = str(row[col]) if row[col] else ""
+                    # Replace newlines with HTML line breaks
+                    cell_value = cell_value.replace('\n', '<br>')
+                    if col == 'Day':
+                        html += f"<td style='border: 1px solid #ddd; padding: 8px; text-align: center; font-weight: bold; background-color: #f8f9fa;'>{cell_value}</td>"
+                    else:
+                        html += f"<td style='border: 1px solid #ddd; padding: 8px; text-align: center; vertical-align: top;'>{cell_value}</td>"
+                html += "</tr>"
+            
+            html += "</table>"
+            return html
+        
+        st.markdown(create_html_table(formatted_teacher_routine), unsafe_allow_html=True)
         
         # Display detailed schedule
         st.markdown("---")
