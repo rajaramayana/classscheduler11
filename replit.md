@@ -2,7 +2,7 @@
 
 ## Overview
 
-A comprehensive class scheduling and routine management system built with Streamlit for educational institutions. The application enables administrators to manage courses, teachers, and class assignments while automatically generating conflict-free timetables. The system supports multiple academic programs (BCA, BIT, B.Tech AI) with semester-based organization and provides both course-centric and teacher-centric routine views. Enhanced with advanced assignment deletion capabilities including bulk delete operations with filtering options.
+A comprehensive class scheduling and routine management system built with Streamlit for educational institutions. The application enables administrators to manage courses, teachers, and class assignments while automatically generating conflict-free timetables. The system supports multiple academic programs (BCA, BIT, B.Tech AI) with semester-based organization and provides both course-centric and teacher-centric routine views. Enhanced with advanced assignment deletion capabilities including bulk delete operations with filtering options and improved display formatting with teacher names appearing below course names in all sections.
 
 ## User Preferences
 
@@ -16,6 +16,7 @@ Preferred communication style: Simple, everyday language.
 - **Component Structure**: Modular UI components separated into dedicated modules (`ui_components.py`) for course management, teacher management, assignment management with advanced deletion capabilities, and routine display
 - **State Management**: Leverages Streamlit's built-in session state and resource caching mechanisms for database connections
 - **Navigation**: Tab-based interface within sections for organized user workflows
+- **Display Enhancement**: Custom HTML table rendering for weekly routines to properly display teacher names below course names with line breaks
 
 ### Backend Architecture
 - **Database Layer**: Custom `DatabaseManager` class providing abstraction over SQLite operations with connection management
