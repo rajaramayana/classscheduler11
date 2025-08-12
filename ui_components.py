@@ -150,11 +150,11 @@ def render_assignment_management(db: DatabaseManager):
         with col1:
             selected_teacher = st.selectbox("Select Teacher", 
                                           options=teachers['Teacher_Code'].tolist(),
-                                          format_func=lambda x: f"{x} - {teachers[teachers['Teacher_Code']==x]['Teacher_Name'].values[0]}")
+                                          format_func=lambda x: f"{x} - {teachers[teachers['Teacher_Code']==x]['Teacher_Name'].iloc[0]}")
             
             selected_course = st.selectbox("Select Course",
                                          options=courses['Course_Code'].tolist(), 
-                                         format_func=lambda x: f"{x} - {courses[courses['Course_Code']==x]['Course_Name'].values[0]}")
+                                         format_func=lambda x: f"{x} - {courses[courses['Course_Code']==x]['Course_Name'].iloc[0]}")
             
             selected_program = st.selectbox("Select Program", Constants.PROGRAMS)
         
@@ -258,7 +258,7 @@ def render_routine_display(db: DatabaseManager):
         if not day_schedule.empty:
             st.write(f"**{day}:**")
             for _, class_info in day_schedule.iterrows():
-                period_time = Constants.PERIODS[class_info['Period']]
+                period_time = Constants.PERIODS.get(int(class_info['Period']), "Unknown")
                 st.write(f"- Period {class_info['Period']} ({period_time}): {class_info['Course_Name']} - {class_info['Teacher_Name']}")
 
 def render_teacher_routine_display(db: DatabaseManager):
@@ -275,12 +275,12 @@ def render_teacher_routine_display(db: DatabaseManager):
     selected_teacher = st.selectbox(
         "Select Teacher",
         options=teachers['Teacher_Code'].tolist(),
-        format_func=lambda x: f"{x} - {teachers[teachers['Teacher_Code']==x]['Teacher_Name'].values[0]}",
+        format_func=lambda x: f"{x} - {teachers[teachers['Teacher_Code']==x]['Teacher_Name'].iloc[0]}",
         key="teacher_routine_select"
     )
     
     if selected_teacher:
-        teacher_name = teachers[teachers['Teacher_Code'] == selected_teacher]['Teacher_Name'].values[0]
+        teacher_name = teachers[teachers['Teacher_Code'] == selected_teacher]['Teacher_Name'].iloc[0]
         st.subheader(f"Weekly Schedule for {teacher_name} ({selected_teacher})")
         
         # Get teacher routine
@@ -305,5 +305,5 @@ def render_teacher_routine_display(db: DatabaseManager):
             if not day_schedule.empty:
                 st.write(f"**{day}:**")
                 for _, class_info in day_schedule.iterrows():
-                    period_time = Constants.PERIODS[class_info['Period']]
+                    period_time = Constants.PERIODS.get(int(class_info['Period']), "Unknown")
                     st.write(f"- Period {class_info['Period']} ({period_time}): {class_info['Course_Name']} - {class_info['Program']} Sem {class_info['Semester']}")

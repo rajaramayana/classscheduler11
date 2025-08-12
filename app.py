@@ -63,7 +63,7 @@ def main():
             st.metric("Total Assignments", len(assignments))
         
         with col4:
-            programs_with_assignments = assignments['Program'].nunique() if len(assignments) > 0 else 0
+            programs_with_assignments = int(assignments['Program'].nunique()) if len(assignments) > 0 else 0
             st.metric("Programs with Routines", programs_with_assignments)
         
         st.markdown("---")

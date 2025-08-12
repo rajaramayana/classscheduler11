@@ -271,7 +271,7 @@ class DatabaseManager:
             conn.close()
     
     def check_teacher_conflict(self, teacher_code: str, period: int, day: str, 
-                             exclude_program: str = None, exclude_semester: int = None) -> bool:
+                             exclude_program: str = "", exclude_semester: int = 0) -> bool:
         """Check if teacher has conflict in the given period and day"""
         conn = self.get_connection()
         cursor = conn.cursor()
