@@ -2,7 +2,7 @@
 
 ## Overview
 
-A comprehensive class scheduling and routine management system built with Streamlit for educational institutions. The application enables administrators to manage courses, teachers, and class assignments while automatically generating conflict-free timetables. The system supports multiple academic programs (BCA, BIT, B.Tech AI) with semester-based organization and provides both course-centric and teacher-centric routine views.
+A comprehensive class scheduling and routine management system built with Streamlit for educational institutions. The application enables administrators to manage courses, teachers, and class assignments while automatically generating conflict-free timetables. The system supports multiple academic programs (BCA, BIT, B.Tech AI) with semester-based organization and provides both course-centric and teacher-centric routine views. Enhanced with advanced assignment deletion capabilities including bulk delete operations with filtering options.
 
 ## User Preferences
 
@@ -13,7 +13,7 @@ Preferred communication style: Simple, everyday language.
 ### Frontend Architecture
 - **Framework**: Streamlit web application with component-based UI design
 - **Layout**: Wide layout configuration with expandable sidebar navigation for optimal screen utilization
-- **Component Structure**: Modular UI components separated into dedicated modules (`ui_components.py`) for course management, teacher management, assignment management, and routine display
+- **Component Structure**: Modular UI components separated into dedicated modules (`ui_components.py`) for course management, teacher management, assignment management with advanced deletion capabilities, and routine display
 - **State Management**: Leverages Streamlit's built-in session state and resource caching mechanisms for database connections
 - **Navigation**: Tab-based interface within sections for organized user workflows
 

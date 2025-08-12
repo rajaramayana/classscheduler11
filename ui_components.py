@@ -140,7 +140,7 @@ def render_assignment_management(db: DatabaseManager):
         st.warning("Please add courses and teachers before making assignments.")
         return
     
-    tab1, tab2 = st.tabs(["Make Assignment", "View Assignments"])
+    tab1, tab2, tab3 = st.tabs(["Make Assignment", "View Assignments", "Delete Assignments"])
     
     with tab1:
         st.subheader("Assign Teacher to Course")
@@ -220,6 +220,98 @@ def render_assignment_management(db: DatabaseManager):
                                                 st.error("Failed to remove assignment!")
         else:
             st.info("No assignments found. Create some assignments to get started.")
+    
+    with tab3:
+        st.subheader("Delete Course Assignments")
+        assignments = db.get_course_assignments()
+        
+        if len(assignments) > 0:
+            st.write("Select assignments to delete:")
+            
+            # Filter options
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                filter_program = st.selectbox("Filter by Program", ["All"] + Constants.PROGRAMS, key="delete_program_filter")
+            with col2:
+                filter_semester = st.selectbox("Filter by Semester", ["All"] + [str(s) for s in Constants.SEMESTERS], key="delete_semester_filter")
+            with col3:
+                filter_day = st.selectbox("Filter by Day", ["All"] + Constants.DAYS, key="delete_day_filter")
+            
+            # Apply filters
+            filtered_assignments = assignments.copy()
+            if filter_program != "All":
+                filtered_assignments = filtered_assignments[filtered_assignments['Program'] == filter_program]
+            if filter_semester != "All":
+                filtered_assignments = filtered_assignments[filtered_assignments['Semester'] == int(filter_semester)]
+            if filter_day != "All":
+                filtered_assignments = filtered_assignments[filtered_assignments['Day'] == filter_day]
+            
+            if len(filtered_assignments) > 0:
+                st.markdown("---")
+                
+                # Display assignments for deletion with checkboxes
+                assignments_to_delete = []
+                
+                for idx, assignment in filtered_assignments.iterrows():
+                    col1, col2 = st.columns([1, 6])
+                    
+                    with col1:
+                        delete_selected = st.checkbox(
+                            "Delete", 
+                            key=f"delete_check_{idx}_{assignment['Teacher_Code']}_{assignment['Course_Code']}_{assignment['Program']}_{assignment['Semester']}_{assignment['Day']}_{assignment['Period']}"
+                        )
+                        if delete_selected:
+                            assignments_to_delete.append(assignment)
+                    
+                    with col2:
+                        # Display assignment details
+                        st.markdown(f"""
+                        <div style='background-color: #fff2f2; padding: 10px; border-radius: 5px; margin: 5px 0; border-left: 3px solid #ff6b6b;'>
+                            <strong>{assignment['Program']} - Semester {assignment['Semester']}</strong><br>
+                            <strong>📅 {assignment['Day']} - Period {assignment['Period']}</strong> ({Constants.PERIODS.get(int(assignment['Period']), 'Unknown')})<br>
+                            <span style='color: #1f77b4;'>{assignment['Course_Name']} ({assignment['Course_Code']})</span><br>
+                            <em>Teacher: {assignment['Teacher_Name']} ({assignment['Teacher_Code']})</em>
+                        </div>
+                        """, unsafe_allow_html=True)
+                
+                # Delete selected assignments
+                if assignments_to_delete:
+                    st.markdown("---")
+                    col1, col2 = st.columns([1, 1])
+                    
+                    with col1:
+                        if st.button("🗑️ Delete Selected Assignments", type="primary", key="bulk_delete_btn"):
+                            deleted_count = 0
+                            failed_count = 0
+                            
+                            for assignment in assignments_to_delete:
+                                if db.remove_course_assignment(
+                                    str(assignment['Teacher_Code']), 
+                                    str(assignment['Course_Code']),
+                                    str(assignment['Program']),
+                                    int(assignment['Semester']),
+                                    str(assignment['Day']),
+                                    int(assignment['Period'])
+                                ):
+                                    deleted_count += 1
+                                else:
+                                    failed_count += 1
+                            
+                            if deleted_count > 0:
+                                st.success(f"Successfully deleted {deleted_count} assignment(s)!")
+                            if failed_count > 0:
+                                st.error(f"Failed to delete {failed_count} assignment(s)!")
+                            
+                            if deleted_count > 0:
+                                st.rerun()
+                    
+                    with col2:
+                        st.info(f"Selected {len(assignments_to_delete)} assignment(s) for deletion")
+                
+            else:
+                st.info("No assignments match the selected filters.")
+        else:
+            st.info("No assignments found to delete.")
 
 def render_routine_display(db: DatabaseManager):
     """Render routine display section"""
