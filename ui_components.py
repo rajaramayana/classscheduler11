@@ -200,7 +200,8 @@ def render_assignment_management(db: DatabaseManager):
                                         st.markdown(f"""
                                         <div style='background-color: #f0f2f6; padding: 8px; border-radius: 5px; margin: 2px 0; border-left: 3px solid #1f77b4;'>
                                             <strong>📅 {assignment['Day']} - Period {assignment['Period']}</strong><br>
-                                            <span style='color: #1f77b4;'>{assignment['Course_Name']}</span> by <em>{assignment['Teacher_Name']}</em>
+                                            <span style='color: #1f77b4; font-weight: bold;'>{assignment['Course_Name']}</span><br>
+                                            <span style='color: #666; font-style: italic;'>({assignment['Teacher_Name']})</span>
                                         </div>
                                         """, unsafe_allow_html=True)
                                     
@@ -269,8 +270,8 @@ def render_assignment_management(db: DatabaseManager):
                         <div style='background-color: #fff2f2; padding: 10px; border-radius: 5px; margin: 5px 0; border-left: 3px solid #ff6b6b;'>
                             <strong>{assignment['Program']} - Semester {assignment['Semester']}</strong><br>
                             <strong>📅 {assignment['Day']} - Period {assignment['Period']}</strong> ({Constants.PERIODS.get(int(assignment['Period']), 'Unknown')})<br>
-                            <span style='color: #1f77b4;'>{assignment['Course_Name']} ({assignment['Course_Code']})</span><br>
-                            <em>Teacher: {assignment['Teacher_Name']} ({assignment['Teacher_Code']})</em>
+                            <span style='color: #1f77b4; font-weight: bold;'>{assignment['Course_Name']} ({assignment['Course_Code']})</span><br>
+                            <span style='color: #666; font-style: italic;'>({assignment['Teacher_Name']} - {assignment['Teacher_Code']})</span>
                         </div>
                         """, unsafe_allow_html=True)
                 
